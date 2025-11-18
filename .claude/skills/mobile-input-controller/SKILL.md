@@ -1,31 +1,30 @@
 ---
 name: mobile-input-controller
-description: This skill helps create mobile input controllers for Unity games using the New Input System. Use this skill when implementing touch controls, virtual joysticks, button inputs, or gesture-based mechanics for mobile platforms. Provides templates, best practices, and patterns for responsive mobile gameplay.
+description: This skill helps create mobile input controllers for Unity games using the New Input System. Use this skill when implementing touch controls only, No virtual joysticks, no button inputs, or no gesture-based mechanics for mobile platforms. Provides templates, best practices, and patterns for responsive mobile gameplay.
 ---
 
 # Mobile Input Controller
 
 ## Overview
 
-This skill provides comprehensive templates and patterns for implementing mobile input controls in Unity using the New Input System. It includes ready-to-use controllers for touch-based mechanics like jumping, movement, shooting, and gestures, along with best practices for mobile UX and performance.
+This skill provides comprehensive templates and patterns for implementing mobile input controls in Unity using the New Input System. It includes ready-to-use controllers for touch-based mechanics like jumping, movement along with best practices for mobile UX and performance.
 
 ## Core Principles for Mobile Input
 
 1. **Responsive Feedback** - Provide immediate visual/haptic feedback for all touch interactions
-2. **Configurable Timing** - Allow designers to tune min/max hold times, swipe thresholds, etc.
+2. **Configurable Timing** - Allow designers to tune min/max hold times.
 3. **Event + Polling Hybrid** - Support both event-driven and polling patterns for flexibility
 4. **New Input System Integration** - Leverage Unity's PlayerInput for cross-platform support
-5. **Visual Indicators** - Show touch points, drag paths, and hold durations
+5. **Visual Indicators** - Show touch points and hold durations
 6. **Graceful Fallbacks** - Handle edge cases like max hold time, multi-touch conflicts
-7. **Performance Optimized** - Minimize allocations, use object pooling for indicators
+7. **Performance Optimized** - Minimize allocations, use object pooling for indicators in Editor Only
 
 ## When to Use This Skill
 
 ### Use this skill when:
 - ✅ Implementing touch controls for mobile games (iOS, Android)
-- ✅ Creating virtual joysticks, buttons, or gesture systems
 - ✅ Converting PC/console controls to mobile-friendly input
-- ✅ Building touch-based mechanics (hold-to-charge, swipe-to-attack, etc.)
+- ✅ Building touch-based mechanics (hold-to-charge)
 - ✅ Integrating Unity's New Input System with mobile platforms
 - ✅ Need responsive, designer-friendly mobile controls
 
@@ -79,7 +78,7 @@ The Mobile Input Controller uses a hybrid **Event-Driven + Polling** architectur
 ```
 
 **Why This Pattern:**
-- **Events** - Fire-and-forget actions (jump trigger, shoot button)
+- **Events** - Fire-and-forget actions (jump trigger)
 - **Polling** - Continuous state queries (is touch held? current position?)
 - **PlayerInput** - Unified input across platforms, rebindable controls
 - **Visual Feedback** - Immediate player response, improved UX
