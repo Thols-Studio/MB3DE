@@ -84,6 +84,208 @@ The Mobile Input Controller uses a hybrid **Event-Driven + Polling** architectur
 - **PlayerInput** - Unified input across platforms, rebindable controls
 - **Visual Feedback** - Immediate player response, improved UX
 
+## Complete API Reference
+
+### Class Description
+
+`MobileInputController` is a MonoBehaviour that tracks touch input using Unity's New Input System. It monitors when the user touches the screen, how long they hold the touch, and where they touch. It provides both events (for one-time actions) and polling methods (for continuous checks).
+
+**What it does:**
+- Detects when user touches and releases the screen
+- Tracks how long the touch is held (in seconds)
+- Converts hold duration to a 0-1 range (normalized time)
+- Fires events when touch starts and ends
+- Lets you check if touch is currently held
+- Tracks touch position on screen
+- Shows visual indicators where the user touches
+- Auto-releases touch if held too long
+
+### Inspector Fields (What You Configure)
+
+#### Touch Timing Settings
+- **`minTouchHoldTime`** (float, default: 0.1s) - The shortest time you must hold before it counts. Prevents accidental quick taps from triggering.
+- **`maxTouchHoldTime`** (float, default: 2.0s) - The longest time you can hold. After this, touch automatically releases. This is your "100%" or "fully charged" time.
+
+#### Visual Feedback Settings
+- **`enableTouchFeedback`** (bool, default: true) - Turn on/off the visual circle that shows where you touched.
+- **`touchIndicatorPrefab`** (GameObject) - The prefab to spawn at touch location (usually a circle sprite or UI image).
+- **`touchCanvas`** (Canvas) - The canvas to put touch indicators on (use Screen Space - Overlay).
+
+#### Input System Settings
+- **`useNewInputSystem`** (bool, default: true) - Use Unity's new Input System (keep this true for mobile).
+- **`touchActionMapName`** (string, default: "Touch") - Name of your Input Actions action map that contains touch actions.
+- **`touchPressActionName`** (string, default: "TouchPress") - Name of the button action that detects touch press/release.
+- **`touchPositionActionName`** (string, default: "TouchPosition") - Name of the Vector2 action that tracks finger position.
+
+#### Screen Configuration
+- **`screenWidthInUnits`** (float, default: 10.0f) - How wide your game world is in Unity units (for position conversion).
+- **`screenHeightInUnits`** (float, default: 18.0f) - How tall your game world is in Unity units (for position conversion).
+
+#### Debug Settings
+- **`enableDebugLogging`** (bool, default: false) - Turn on console logs to see touch events and timing.
+
+### Public Events (What You Subscribe To)
+
+#### `OnTouchStartedEventHandler` (System.Action<float>)
+**What it does:** Fires the instant the user touches the screen.
+
+**Parameter:** `normalizedHoldTime` - Always 0.0 when started (no time held yet).
+
+**When to use:** For immediate actions like starting a jump animation, showing a power-up UI, or playing a sound effect.
+
+**Example:**
+```csharp
+inputController.OnTouchStartedEventHandler += (normalizedTime) => {
+    Debug.Log("Touch started!");
+    PlayTouchSound();
+};
+```
+
+#### `OnTouchReleasedEventHandler` (System.Action<float>)
+**What it does:** Fires when the user lifts their finger from the screen.
+
+**Parameter:** `normalizedHoldTime` - A number from 0 to 1 showing how long they held (0 = instant release, 1 = held for maxTouchHoldTime).
+
+**When to use:** For actions that depend on how long you held, like jump height, attack power, or shot strength.
+
+**Example:**
+```csharp
+inputController.OnTouchReleasedEventHandler += (holdTime) => {
+    float jumpHeight = holdTime * maxJumpHeight;
+    player.Jump(jumpHeight);
+};
+```
+
+### Public Properties (What You Check)
+
+#### `IsTouchHeld` (bool, read-only)
+**What it does:** Tells you if the user's finger is currently touching the screen.
+
+**Returns:** `true` = finger is down, `false` = no touch
+
+**When to use:** In Update() to continuously check if user is holding (for charging effects, aiming, etc.)
+
+**Example:**
+```csharp
+void Update() {
+    if (inputController.IsTouchHeld) {
+        ShowChargingEffect();
+    } else {
+        HideChargingEffect();
+    }
+}
+```
+
+### Public Methods (What You Call)
+
+#### `GetCurrentNormalizedHoldTime()` → float
+**What it does:** Tells you how long the current touch has been held, as a percentage from 0 to 1.
+
+**Returns:**
+- `0.0` = just touched or not touching
+- `0.5` = held for 50% of maxTouchHoldTime
+- `1.0` = held for 100% (maxTouchHoldTime reached)
+
+**When to use:** For charging mechanics, power meters, progress bars.
+
+**Example:**
+```csharp
+float charge = inputController.GetCurrentNormalizedHoldTime();
+powerBar.fillAmount = charge; // Update UI slider from 0-100%
+```
+
+#### `GetCurrentHoldDuration()` → float
+**What it does:** Tells you exactly how many seconds the current touch has been held.
+
+**Returns:** Seconds as a float (e.g., 1.5 means 1.5 seconds), or 0 if not touching.
+
+**When to use:** When you need exact time rather than percentage (for stage-based charging, timers).
+
+**Example:**
+```csharp
+float seconds = inputController.GetCurrentHoldDuration();
+if (seconds > 1.0f) {
+    ActivateSuperMode();
+}
+```
+
+#### `GetCurrentTouchPosition()` → Vector2
+**What it does:** Tells you where on the screen the user is currently touching.
+
+**Returns:** Screen coordinates in pixels (e.g., x=540, y=960 on a 1080x1920 screen), or Vector2.zero if not touching.
+
+**When to use:** For aiming mechanics, directional input, showing effects at touch location.
+
+**Example:**
+```csharp
+Vector2 screenPos = inputController.GetCurrentTouchPosition();
+Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
+aimReticle.position = worldPos; // Aim gun at touch point
+```
+
+### Private Fields (Internal State - For Reference Only)
+
+These fields store the controller's internal state. You don't access these directly, but understanding them helps you know how the controller works internally:
+
+- **`isTouchHeld`** (bool) - True while finger is on screen
+- **`wasTouchHeld`** (bool) - True if finger was on screen last frame (for detecting release)
+- **`touchHoldStartTime`** (float) - Time.time when touch began
+- **`lastNormalizedHoldTime`** (float) - Stores the hold time percentage when touch ends
+- **`touchStartPosition`** (Vector2) - Where the touch started on screen
+- **`currentTouchPosition`** (Vector2) - Current finger position on screen
+- **`playerInput`** (PlayerInput) - Reference to PlayerInput component
+- **`touchActionMap`** (InputActionMap) - The Touch action map from Input Actions
+- **`touchPressAction`** (InputAction) - The press/release button action
+- **`touchPositionAction`** (InputAction) - The position Vector2 action
+- **`mainCamera`** (Camera) - Cached reference to Camera.main
+- **`currentJumpIndicator`** (GameObject) - The currently shown touch indicator instance
+
+### Unity Lifecycle Methods (When Things Happen)
+
+#### `Awake()`
+**What it does:** Runs once when the object is created. Sets up screen dimensions and finds the PlayerInput component.
+
+#### `OnEnable()`
+**What it does:** Runs when object becomes active. Enables the input actions so touch can be detected.
+
+#### `Start()`
+**What it does:** Runs once before first frame. Finds and caches the main camera.
+
+#### `Update()`
+**What it does:** Runs every frame. Checks touch state, updates hold duration, manages auto-release at max time.
+
+#### `OnDisable()`
+**What it does:** Runs when object becomes inactive. Disables input actions to save performance.
+
+#### `OnDestroy()`
+**What it does:** Runs when object is destroyed. Cleans up event subscriptions and destroys indicator GameObject.
+
+### Key Internal Methods (How It Works)
+
+#### `InitializeInputSystem()`
+Finds the PlayerInput component and locates the Touch action map by name.
+
+#### `SetupInputActions()`
+Finds the TouchPress and TouchPosition actions by name, subscribes to their events.
+
+#### `EnableInputActions()` / `DisableInputActions()`
+Turns the input actions on and off (for pausing or disabling input).
+
+#### `OnTouchStarted(InputAction.CallbackContext)`
+Called by Input System when touch begins. Records start time, position, creates visual indicator.
+
+#### `OnTouchCanceled(InputAction.CallbackContext)`
+Called by Input System when touch ends. Calculates final hold time, fires OnTouchReleased event.
+
+#### `HandleTouchState()`
+Runs every frame in Update. Checks if touch is held, updates position, handles auto-release at max time.
+
+#### `CreateTouchIndicator()` / `DestroyTouchIndicator()`
+Spawns and destroys the visual touch feedback GameObject.
+
+#### `GetNormalizedHoldTime(float duration)`
+Converts raw seconds to 0-1 range based on min/max hold times. Clamps between 0 and 1.
+
 ## Key Components
 
 ### 1. Touch Hold Controller (Base Template)
@@ -413,7 +615,7 @@ private void Update()
 {
     if (inputController.IsTouchHeld)
     {
-        Vector2 touchPos = inputController.currentTouchPosition;
+        Vector2 touchPos = inputController.GetCurrentTouchPosition();
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(touchPos);
 
         // Aim weapon at touch point
