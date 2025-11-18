@@ -77,7 +77,7 @@
 After installing Input System, Unity will ask to restart. This switches from old Input Manager to New Input System. If you need both:
 
 ```
-Edit → Project Settings → Player → Active Input Handling → New Input System
+Edit → Project Settings → Player → Active Input Handling → Input System Package (New)
 ```
 
 ### Target Platforms
@@ -181,15 +181,15 @@ Or manually:
 4. Paste content
 5. Save
 
-#### 2.2 Create Input Manager GameObject
+#### 2.2 Create Player GameObject
 
 1. **Create GameObject:**
    - In Hierarchy: Right-click → Create Empty
-   - Name: `InputManager`
+   - Name: `Player`
    - Reset Transform (position 0,0,0)
 
 2. **Add MobileInputController:**
-   - Select `InputManager`
+   - Select `Player`
    - Add Component → `Mobile Input Controller`
    - This automatically adds `PlayerInput` component
 
@@ -218,7 +218,7 @@ Or manually:
    ```
    Right-click TouchIndicatorCanvas → UI → Image
    Name: TouchIndicator
-   Color: White with Alpha 0.5
+   Color: Yellow with Alpha 0.5
    Width: 50, Height: 50
    ```
 
