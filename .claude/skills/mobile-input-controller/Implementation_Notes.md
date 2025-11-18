@@ -65,8 +65,8 @@
 
 ### Unity Version
 - **Minimum:** Unity 2021.3 LTS
-- **Recommended:** Unity 2022.3 LTS or newer
-- **Tested On:** Unity 2022.3 LTS
+- **Recommended:** Unity 2022.3 LTS or 6000.0.62f1 LTS or newer
+- **Tested On:** Unity 6000.0.62f1 LTS
 
 ### Required Packages
 - **Input System** (com.unity.inputsystem) version 1.5.0 or newer
@@ -77,7 +77,7 @@
 After installing Input System, Unity will ask to restart. This switches from old Input Manager to New Input System. If you need both:
 
 ```
-Edit → Project Settings → Player → Active Input Handling → Both
+Edit → Project Settings → Player → Active Input Handling → New Input System
 ```
 
 ### Target Platforms
@@ -201,7 +201,7 @@ Or manually:
 
 4. **Configure MobileInputController:**
    - Min Touch Hold Time: `0.1`
-   - Max Touch Hold Time: `2.0` (adjust for your game)
+   - Max Touch Hold Time: `1.0` (adjust for your game)
    - Enable Touch Feedback: ✓ (checked)
    - Enable Debug Logging: ✓ (for testing, uncheck later)
 
@@ -219,7 +219,7 @@ Or manually:
    Right-click TouchIndicatorCanvas → UI → Image
    Name: TouchIndicator
    Color: White with Alpha 0.5
-   Width: 100, Height: 100
+   Width: 50, Height: 50
    ```
 
 3. **Make it a prefab:**
