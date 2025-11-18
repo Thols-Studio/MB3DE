@@ -305,39 +305,6 @@ Converts raw seconds to 0-1 range based on min/max hold times. Clamps between 0 
 
 **Template:** `assets/templates/MobileInputController.cs`
 
-### 2. Virtual Joystick Controller
-
-**Purpose:** Analog movement input for mobile (drag-based directional control).
-
-**Use Cases:**
-- Character movement (8-directional or analog)
-- Camera rotation
-- Vehicle steering
-
-**Template:** `assets/templates/VirtualJoystickController.cs` *(To be implemented)*
-
-### 3. Swipe Gesture Controller
-
-**Purpose:** Detect directional swipes (up/down/left/right).
-
-**Use Cases:**
-- Menu navigation
-- Attack combos (swipe patterns)
-- Quick dodge/dash mechanics
-
-**Template:** `assets/templates/SwipeGestureController.cs` *(To be implemented)*
-
-### 4. Multi-Touch Controller
-
-**Purpose:** Handle simultaneous touch inputs (pinch-to-zoom, two-finger rotation).
-
-**Use Cases:**
-- Camera controls (pinch-to-zoom)
-- Rotation gestures
-- Multi-finger combos
-
-**Template:** `assets/templates/MultiTouchController.cs` *(To be implemented)*
-
 ## Usage Guide
 
 ### Step 1: Set Up Unity Input System
