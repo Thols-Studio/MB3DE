@@ -22,60 +22,93 @@
 
 ## Quick Start
 
-**Goal:** Get player movement working in under 5 minutes.
+**Goal:** Get touch-controlled player movement working in under 10 minutes.
 
-### Minimal Setup
+### Minimal Setup with Touch Input
 
-1. **Copy template to your project:**
+**Prerequisites:** You must have the `mobile-input-controller` skill setup first. See that skill's Implementation_Notes.md for setup.
+
+1. **Copy templates to your project:**
    ```bash
+   # Copy PlayerMovement template
    cp .claude/skills/player-movement-executor/assets/templates/PlayerMovement.cs \
+      Assets/_Project/Scripts/Player/
+
+   # Copy integrated controller example
+   cp .claude/skills/player-movement-executor/assets/examples/TouchPlayerController.cs \
       Assets/_Project/Scripts/Player/
    ```
 
 2. **Create player GameObject:**
    - Create → 3D Object → Capsule
    - Name: Player
-   - Add Component → Player Movement
+   - Position: (0, 1, 0)
 
-3. **Configure in Inspector:**
+3. **Add all required components:**
+   - Add Component → Mobile Input Controller (from mobile-input-controller skill)
+   - Add Component → Player Movement (from player-movement-executor skill)
+   - Add Component → Touch Player Controller (the integrated controller)
+
+4. **Configure MobileInputController:**
+   - Min Touch Hold Time: 0.1
+   - Max Touch Hold Time: 1.0
+   - Enable Debug Logging: ✓ (for testing)
+
+5. **Configure PlayerMovement:**
    - Forward Speed: 10
    - Horizontal Speed: 0.5
    - Max Horizontal Bounds: 5
+   - Show Debug Info: ✓ (for testing)
 
-4. **Create simple controller:**
-   ```csharp
-   using UnityEngine;
+6. **Configure TouchPlayerController:**
+   - Mobile Input Controller: (auto-assigned)
+   - Player Movement: (auto-assigned)
+   - Normal Speed: 10
+   - Boosted Speed: 20
+   - Enable Speed Boost: ✓
 
-   public class SimpleController : MonoBehaviour {
-       [SerializeField] private PlayerMovement movement;
+7. **Press Play and test:**
+   - Touch and hold anywhere on screen
+   - Player moves forward
+   - Touch left/right side to move horizontally
+   - Hold longer for speed boost
 
-       void Update() {
-           float input = Input.GetAxis("Horizontal");
-           movement.SetHorizontalInput(input);
-       }
-   }
-   ```
+**Result:** Player responds to touch input with smooth horizontal movement and forward motion!
 
-5. **Add to player, assign reference, press Play!**
-
-**Result:** Player moves forward automatically, use arrow keys to move left/right.
+**Architecture Flow:**
+```
+Touch Screen → MobileInputController → TouchPlayerController → PlayerMovement → Transform
+```
 
 ---
 
 ## Prerequisites
 
+### Required Skills
+- **mobile-input-controller skill** - REQUIRED for touch input integration
+  - Must be setup and working before using this skill
+  - See `.claude/skills/mobile-input-controller/Implementation_Notes.md` for setup
+
 ### Unity Version
-- **Minimum:** Unity 2020.3 LTS
-- **Recommended:** Unity 2022.3 LTS or newer
+- **Minimum:** Unity 2021.3 LTS
+- **Recommended:** Unity 2022.3 LTS or 6000.0.62f1 LTS or newer
+- **Tested On:** Unity 6000.0.62f1 LTS
+
+### Required Packages
+- **Input System** (com.unity.inputsystem) version 1.5.0 or newer
+  - Required by mobile-input-controller skill
+  - Install via Package Manager
 
 ### Project Type
-- 3D project
+- 3D mobile game project
 - Any render pipeline (Built-in, URP, HDRP)
+- Target platforms: iOS 12.0+ or Android API Level 24+
 
 ### Knowledge Requirements
-- Basic C# (classes, methods, variables)
-- Unity MonoBehaviour lifecycle (Awake, Update)
+- Basic C# (classes, methods, variables, events)
+- Unity MonoBehaviour lifecycle (Awake, OnEnable, OnDisable, Update)
 - SerializeField and Inspector usage
+- Event subscription/unsubscription pattern
 
 ### Optional (For Physics Version)
 - Rigidbody component
@@ -281,70 +314,116 @@ Assets/
 
 ## Implementation Patterns
 
-### Pattern 1: Keyboard Input (Desktop)
+All patterns use **MobileInputController** for touch detection and **PlayerMovement** for movement execution.
+
+### Pattern 1: Touch Position-Based Movement (Recommended)
+
+**Use Case:** Player moves left/right based on where they touch on screen.
 
 ```csharp
-public class KeyboardController : MonoBehaviour {
+public class TouchPositionController : MonoBehaviour {
+    [SerializeField] private MobileInputController mobileInput;
     [SerializeField] private PlayerMovement movement;
 
     void Update() {
-        float input = Input.GetAxis("Horizontal");
-        movement.SetHorizontalInput(input);
-    }
-}
-```
-
-### Pattern 2: Touch Input (Mobile)
-
-```csharp
-public class TouchController : MonoBehaviour {
-    [SerializeField] private PlayerMovement movement;
-    [SerializeField] private float touchSensitivity = 0.01f;
-
-    private Vector2 lastTouchPos;
-
-    void Update() {
-        if (Input.touchCount > 0) {
-            Touch touch = Input.GetTouch(0);
-
-            if (touch.phase == TouchPhase.Moved) {
-                float delta = touch.deltaPosition.x * touchSensitivity;
-                movement.SetHorizontalInput(Mathf.Clamp(delta, -1f, 1f));
-            }
+        if (mobileInput.IsTouchHeld) {
+            Vector2 touchPos = mobileInput.GetCurrentTouchPosition();
+            float screenCenter = Screen.width / 2f;
+            float input = (touchPos.x - screenCenter) / screenCenter;
+            movement.SetHorizontalInput(input);
         } else {
-            // Release input when not touching
             movement.SetHorizontalInput(0f);
         }
     }
 }
 ```
 
-### Pattern 3: Lane-Based Movement
+**Architecture Flow:**
+```
+Touch Screen → MobileInputController.GetCurrentTouchPosition()
+            → TouchPositionController (convert to -1 to 1)
+            → PlayerMovement.SetHorizontalInput()
+```
+
+### Pattern 2: Touch Hold for Speed Boost
+
+**Use Case:** Hold touch longer to move faster (endless runner with boost).
 
 ```csharp
-public class LaneController : MonoBehaviour {
+public class TouchHoldSpeedController : MonoBehaviour {
+    [SerializeField] private MobileInputController mobileInput;
+    [SerializeField] private PlayerMovement movement;
+    [SerializeField] private float normalSpeed = 10f;
+    [SerializeField] private float maxSpeed = 20f;
+
+    void Update() {
+        if (mobileInput.IsTouchHeld) {
+            // Speed based on hold duration
+            float holdTime = mobileInput.GetCurrentNormalizedHoldTime();
+            float speed = Mathf.Lerp(normalSpeed, maxSpeed, holdTime);
+            movement.SetForwardSpeed(speed);
+
+            // Horizontal from touch position
+            Vector2 touchPos = mobileInput.GetCurrentTouchPosition();
+            float input = (touchPos.x - Screen.width / 2f) / (Screen.width / 2f);
+            movement.SetHorizontalInput(input);
+        }
+    }
+}
+```
+
+**Architecture Flow:**
+```
+Touch Screen → MobileInputController (tracks hold duration)
+            → TouchHoldSpeedController (lerp speed based on hold)
+            → PlayerMovement.SetForwardSpeed()
+            → PlayerMovement.SetHorizontalInput()
+```
+
+### Pattern 3: Touch-Based Lane Switching
+
+**Use Case:** Tap left/right side of screen to switch lanes (Subway Surfers style).
+
+```csharp
+public class TouchLaneController : MonoBehaviour {
+    [SerializeField] private MobileInputController mobileInput;
     [SerializeField] private PlayerMovement movement;
     [SerializeField] private float[] lanes = { -4f, 0f, 4f };
 
     private int currentLane = 1;
 
-    void Update() {
-        // Switch lanes
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+    void OnEnable() {
+        mobileInput.OnTouchStartedEventHandler += OnTouchStarted;
+    }
+
+    void OnDisable() {
+        mobileInput.OnTouchStartedEventHandler -= OnTouchStarted;
+    }
+
+    void OnTouchStarted(float _) {
+        Vector2 touchPos = mobileInput.GetCurrentTouchPosition();
+        if (touchPos.x < Screen.width / 2f) {
             currentLane = Mathf.Max(0, currentLane - 1);
-        }
-        if (Input.GetKeyDown(KeyCode.RightArrow)) {
+        } else {
             currentLane = Mathf.Min(lanes.Length - 1, currentLane + 1);
         }
+    }
 
-        // Calculate input to reach target lane
+    void Update() {
         float target = lanes[currentLane];
         float current = movement.GetHorizontalPosition();
         float input = Mathf.Clamp((target - current) * 5f, -1f, 1f);
-
         movement.SetHorizontalInput(input);
     }
 }
+```
+
+**Architecture Flow:**
+```
+Touch Screen → MobileInputController.OnTouchStartedEventHandler (event)
+            → TouchLaneController.OnTouchStarted() (determine lane)
+            → TouchLaneController.Update() (smooth to target lane)
+            → PlayerMovement.SetHorizontalInput()
 ```
 
 ---
