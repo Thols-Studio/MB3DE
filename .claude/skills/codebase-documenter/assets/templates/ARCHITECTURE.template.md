@@ -76,78 +76,91 @@ This document explains the high-level architecture of [Project Name], a Unity3D 
 ProjectRoot/
 ├── Assets/                          # All game assets (version controlled)
 │   ├── _Project/                   # Project-specific assets (prefix with _ to sort first)
-│   │   ├── Scenes/                 # Game scenes
-│   │   │   ├── _Main.unity        # Bootstrap/initialization scene
-│   │   │   ├── MainMenu.unity     # Main menu scene
-│   │   │   ├── Gameplay/          # Gameplay scenes
-│   │   │   │   ├── Level01.unity
-│   │   │   │   └── Level02.unity
-│   │   │   └── Testing/           # Test/debug scenes
+│   │   ├── Editor/                 # Editor-only scripts and tools
+│   │   │   └── [Custom editor scripts, tools, and inspector drawers]
 │   │   │
-│   │   ├── Scripts/                # C# scripts
-│   │   │   ├── Core/              # Core systems and managers
-│   │   │   │   ├── GameManager.cs
-│   │   │   │   ├── SceneLoader.cs
-│   │   │   │   └── SaveSystem.cs
-│   │   │   ├── Gameplay/          # Gameplay-specific scripts
-│   │   │   │   ├── Player/
-│   │   │   │   ├── Enemies/
-│   │   │   │   └── Interactables/
-│   │   │   ├── UI/                # UI controllers
-│   │   │   │   ├── MainMenuUI.cs
-│   │   │   │   └── HUD.cs
-│   │   │   ├── Data/              # ScriptableObject definitions
-│   │   │   │   ├── GameConfig.cs
-│   │   │   │   └── WeaponData.cs
-│   │   │   └── Utilities/         # Helper classes and extensions
-│   │   │       ├── ObjectPool.cs
-│   │   │       └── Extensions.cs
-│   │   │
-│   │   ├── Prefabs/                # Reusable GameObjects
-│   │   │   ├── Characters/
-│   │   │   ├── Items/
-│   │   │   ├── UI/
-│   │   │   └── VFX/
-│   │   │
-│   │   ├── ScriptableObjects/      # Data assets
-│   │   │   ├── GameConfig/
-│   │   │   ├── Items/
-│   │   │   └── Levels/
-│   │   │
-│   │   ├── Materials/              # Shaders and materials
-│   │   │   ├── Characters/
-│   │   │   └── Environment/
-│   │   │
-│   │   ├── Sprites/                # 2D artwork (if applicable)
-│   │   │   ├── Characters/
-│   │   │   ├── UI/
-│   │   │   └── Environment/
-│   │   │
-│   │   ├── Models/                 # 3D models (if applicable)
-│   │   │   ├── Characters/
-│   │   │   └── Environment/
-│   │   │
-│   │   ├── Audio/                  # Sound effects and music
-│   │   │   ├── Music/
-│   │   │   ├── SFX/
-│   │   │   └── Mixers/
-│   │   │
-│   │   ├── Animations/             # Animation controllers and clips
-│   │   │   ├── Player/
-│   │   │   └── Enemies/
-│   │   │
-│   │   └── Resources/              # Runtime-loadable assets (use sparingly)
-│   │       └── Config/
+│   │   └── Runtime/                # Runtime game assets
+│   │       ├── Art/                # All visual assets
+│   │       │   ├── Models/         # 3D models and meshes
+│   │       │   │   ├── Characters/
+│   │       │   │   ├── Environment/
+│   │       │   │   └── Props/
+│   │       │   ├── Textures/       # Texture maps and sprites
+│   │       │   │   ├── Characters/
+│   │       │   │   ├── Environment/
+│   │       │   │   └── UI/
+│   │       │   └── Materials/      # Materials and shaders
+│   │       │       ├── Characters/
+│   │       │       └── Environment/
+│   │       │
+│   │       ├── Scripts/            # C# runtime scripts
+│   │       │   ├── Core/           # Core systems and managers
+│   │       │   │   ├── GameManager.cs
+│   │       │   │   ├── SceneLoader.cs
+│   │       │   │   └── SaveSystem.cs
+│   │       │   ├── Gameplay/       # Gameplay-specific scripts
+│   │       │   │   ├── Player/
+│   │       │   │   ├── Input/
+│   │       │   │   └── Movement/
+│   │       │   ├── UI/             # UI controllers and components
+│   │       │   │   ├── MainMenuUI.cs
+│   │       │   │   └── HUD.cs
+│   │       │   ├── Data/           # ScriptableObject definitions
+│   │       │   │   ├── GameConfig.cs
+│   │       │   │   └── LevelData.cs
+│   │       │   └── Utilities/      # Helper classes and extensions
+│   │       │       ├── ObjectPool.cs
+│   │       │       └── Extensions.cs
+│   │       │
+│   │       ├── Levels/             # Level-related assets
+│   │       │   ├── Scenes/         # Unity scene files
+│   │       │   │   ├── _Main.unity        # Bootstrap scene
+│   │       │   │   ├── MainMenu.unity     # Main menu
+│   │       │   │   ├── Gameplay/          # Gameplay scenes
+│   │       │   │   │   ├── Level01.unity
+│   │       │   │   │   └── Level02.unity
+│   │       │   │   └── Testing/           # Test/debug scenes
+│   │       │   │
+│   │       │   └── Prefabs/        # Level prefabs and reusable GameObjects
+│   │       │       ├── Characters/
+│   │       │       ├── Environment/
+│   │       │       ├── UI/
+│   │       │       └── VFX/
+│   │       │
+│   │       ├── Scriptable Objects/ # ScriptableObject data assets
+│   │       │   ├── GameConfig/
+│   │       │   ├── Levels/
+│   │       │   └── Audio/
+│   │       │
+│   │       ├── Fonts/              # Font assets for UI and text
+│   │       │   ├── TextMeshPro/
+│   │       │   └── [Custom fonts]
+│   │       │
+│   │       ├── docs/               # Project documentation
+│   │       │   ├── Architecture.md
+│   │       │   └── [Design documents]
+│   │       │
+│   │       ├── Packages/           # Project-specific package resources
+│   │       │   └── [Custom package assets]
+│   │       │
+│   │       ├── MIDI/               # MIDI files for music sequencing
+│   │       │   ├── Tracks/
+│   │       │   └── [MIDI sequences]
+│   │       │
+│   │       └── Audio/              # Audio assets
+│   │           ├── Music/          # Background music tracks
+│   │           ├── SFX/            # Sound effects
+│   │           └── Mixers/         # Audio mixer assets
 │   │
 │   ├── Plugins/                    # Third-party plugins and native code
-│   │   ├── Android/
-│   │   ├── iOS/
-│   │   └── [PluginName]/
+│   │   ├── Android/                # Android-specific plugins
+│   │   ├── iOS/                    # iOS-specific plugins
+│   │   └── [PluginName]/          # Other third-party plugins
 │   │
-│   ├── StreamingAssets/            # Assets that need to be accessed by path
+│   ├── StreamingAssets/            # Assets accessed by file path at runtime
 │   │   └── [Platform-specific assets]
 │   │
-│   └── TextMesh Pro/               # TextMesh Pro assets (auto-generated)
+│   └── TextMesh Pro/               # TextMesh Pro package assets (auto-generated)
 │
 ├── Packages/                        # Unity Package Manager packages
 │   ├── manifest.json               # Package dependencies
@@ -164,7 +177,25 @@ ProjectRoot/
 
 ### Directory Purpose and Rules
 
-#### Assets/_Project/Scripts/Core/
+#### Assets/_Project/Editor/
+**Purpose:** Editor-only scripts and custom tools that enhance the Unity Editor workflow.
+
+**What goes here:**
+- Custom Inspector drawers (using Odin Inspector or Unity's PropertyDrawer)
+- Editor window tools and utilities
+- Custom menu items and shortcuts
+- Build scripts and automation tools
+- Asset post-processors and import pipelines
+
+**What doesn't go here:**
+- Runtime scripts (put in `Runtime/Scripts/`)
+- Game logic or gameplay code
+
+**When to add a file:** When creating editor tools, custom inspectors, or build automation.
+
+**Note:** Files in this folder are automatically excluded from builds.
+
+#### Assets/_Project/Runtime/Scripts/Core/
 **Purpose:** Core systems that manage game-wide functionality.
 
 **What goes here:**
@@ -183,15 +214,15 @@ ProjectRoot/
 
 **Pattern to follow:** Singleton MonoBehaviours or Static service locators
 
-#### Assets/_Project/Scripts/Gameplay/
-**Purpose:** Gameplay-specific logic for player, enemies, items, etc.
+#### Assets/_Project/Runtime/Scripts/Gameplay/
+**Purpose:** Gameplay-specific logic for player, input, movement, and game mechanics.
 
 **What goes here:**
 - Player controllers and abilities
-- Enemy AI and behavior
+- Input handling (MobileInputController)
+- Movement systems (PlayerMovement)
 - Interactive objects (doors, pickups, triggers)
 - Game mechanics implementation
-- Combat systems
 
 **What doesn't go here:**
 - UI logic (put in `UI/`)
@@ -200,42 +231,103 @@ ProjectRoot/
 
 **When to add a file:** When implementing game-specific features and mechanics.
 
-#### Assets/_Project/Scripts/Data/
+#### Assets/_Project/Runtime/Scripts/Data/
 **Purpose:** ScriptableObject definitions and data containers.
 
 **What goes here:**
 - ScriptableObject class definitions
 - Configuration classes
 - Stat definitions
-- Item/weapon/ability data structures
+- Level/Game data structures
 
 **What doesn't go here:**
 - MonoBehaviour scripts (put in appropriate folder)
-- Actual data instances (those go in `ScriptableObjects/` as .asset files)
+- Actual data instances (those go in `Runtime/Scriptable Objects/` as .asset files)
 
 **When to add a file:** When creating new data types that will be defined in the Unity editor.
 
-#### Assets/_Project/Prefabs/
-**Purpose:** Reusable GameObject templates.
-
-**Naming convention:** PascalCase, descriptive names (e.g., `EnemyZombie`, `WeaponSword`, `UIHealthBar`)
+#### Assets/_Project/Runtime/Art/
+**Purpose:** All visual assets including models, textures, and materials.
 
 **Organization:**
-- Organize by category (Characters, Items, UI, VFX)
-- Use prefab variants for variations
-- Keep prefabs as small and modular as possible
+- **Models/**: 3D meshes organized by category (Characters, Environment, Props)
+- **Textures/**: All texture maps (albedo, normal, metallic, etc.)
+- **Materials/**: Material assets that reference textures and shaders
 
-**When to create:** When a GameObject will be instantiated multiple times or needs to be shared across scenes.
+**Best practices:**
+- Use consistent naming conventions (e.g., `Character_Hero_Albedo.png`)
+- Optimize texture sizes for mobile (2048x2048 max for characters)
+- Use texture atlases where possible to reduce draw calls
 
-#### Assets/_Project/ScriptableObjects/
+#### Assets/_Project/Runtime/Levels/
+**Purpose:** Level-related assets including scenes and prefabs.
+
+**Organization:**
+- **Scenes/**: Unity scene files organized by type (Main, MainMenu, Gameplay, Testing)
+- **Prefabs/**: Reusable GameObject templates categorized by type
+
+**Prefab naming convention:** PascalCase, descriptive names (e.g., `Player_Character`, `Environment_Platform`, `UI_MainMenu`)
+
+**When to create:**
+- Scenes: For new game levels, menus, or testing environments
+- Prefabs: When a GameObject will be instantiated multiple times or shared across scenes
+
+#### Assets/_Project/Runtime/Scriptable Objects/
 **Purpose:** Instances of ScriptableObject data assets.
 
 **Organization:**
-- Mirror the structure of `Scripts/Data/`
-- Use folders to categorize by type
+- Mirror the structure of `Runtime/Scripts/Data/`
+- Use folders to categorize by type (GameConfig, Levels, Audio)
 - Use descriptive names for easy identification
 
-**When to create:** For configuration data, item definitions, game balance values, etc.
+**When to create:** For configuration data, level definitions, game balance values, audio settings, etc.
+
+#### Assets/_Project/Runtime/Audio/
+**Purpose:** All audio assets including music, sound effects, and audio mixers.
+
+**Organization:**
+- **Music/**: Background music tracks (use Vorbis streaming)
+- **SFX/**: Sound effects (use compressed in-memory format)
+- **Mixers/**: Unity Audio Mixer assets for volume control and effects
+
+**Best practices:**
+- Use 22050 Hz for SFX, 44100 Hz for music
+- Mono audio for positional sounds, stereo for music
+- Configure compression per platform (Vorbis for Android, ADPCM for iOS)
+
+#### Assets/_Project/Runtime/MIDI/
+**Purpose:** MIDI files for music sequencing and procedural music generation.
+
+**What goes here:**
+- MIDI track files
+- Musical sequences
+- Procedural music data
+
+**When to use:** When implementing dynamic or procedural music systems.
+
+#### Assets/_Project/Runtime/Fonts/
+**Purpose:** Font assets for UI and text rendering.
+
+**Organization:**
+- TextMesh Pro font assets
+- Custom font files
+
+**Best practices:**
+- Use TextMesh Pro for better text rendering on mobile
+- Include font atlases optimized for needed characters
+
+#### Assets/_Project/Runtime/docs/
+**Purpose:** Project documentation and design documents.
+
+**What goes here:**
+- Architecture documentation
+- Design documents
+- Feature specifications
+- API documentation
+
+**Best practices:**
+- Keep documentation up-to-date with code changes
+- Use markdown format for easy version control
 
 ## Unity Execution Flow
 
