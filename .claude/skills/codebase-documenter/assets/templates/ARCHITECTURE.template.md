@@ -528,30 +528,52 @@ private void Awake() { animator = GetComponentInChildren<Animator>(); }
 
 ```csharp
 // Using C# events
-public class HealthSystem : MonoBehaviour
+public class MobileInputController : MonoBehaviour
 {
-    public event Action<int> OnHealthChanged;
+    private InputAction touchPressAction;
+    public event Action<int> OnTouchStartedEventHandler;
 
-    public void TakeDamage(int damage)
-    {
-        currentHealth -= damage;
-        OnHealthChanged?.Invoke(currentHealth);
+    void OnEnable() {      
+        touchPressAction?.Enable();
     }
+
+    private void Awake() {
+        touchPressAction = touchActionMap.FindAction("TouchPress");
+    }
+
+     private void OnTouchStarted(InputAction.CallbackContext context) {        
+         OnTouchStartedEventHandler?.Invoke(0f);
+     }
+
+     void OnDisable() {
+         touchPressAction?.Disable();
+     }  
+     
+     void OnDestroy() {
+           if (touchPressAction != null) {
+               touchPressAction.started -= OnTouchStarted;             
+               touchPressAction.Dispose();
+           }     
+     }
 }
 
 // Listener
-public class HealthUI : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private HealthSystem healthSystem;
+    [SerializeField] private MobileInputController _inputController;;
 
     private void OnEnable()
     {
-        healthSystem.OnHealthChanged += UpdateHealthBar;
+      // Subscribe to input events
+       if (_inputController != null)
+       {
+           _inputController.OnTouchStartedEventHandler += OnTouchHoldStarted_Handler;
+       }
     }
 
     private void OnDisable()
     {
-        healthSystem.OnHealthChanged -= UpdateHealthBar;
+         _inputController.OnTouchStartedEventHandler -= OnTouchHoldStarted_Handler;
     }
 }
 ```
