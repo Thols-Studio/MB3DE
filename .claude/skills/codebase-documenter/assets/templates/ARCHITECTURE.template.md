@@ -59,9 +59,13 @@ This document explains the high-level architecture of [Project Name], a Unity3D 
 |-------|-----------|-----------------|
 | Game Engine | Unity 6000.0.62f1 LTS | Long-term support, stability for production |
 | Scripting | C# .NET Standard 2.1 | Unity's primary language, strong typing |
-| Input | [New Input System] | [Better multi-platform support / Simpler API] |
+| Input | New Input System | Better multi-platform support, mobile touch controls |
 | Physics | [2D / 3D / Both] | [Project requirements] |
 | UI | [UI Toolkit / UGUI / Both] | [Modern/Legacy approach] |
+| Animation/Tweening | DOTween Pro | Professional tweening engine, powerful and performant |
+| Inspector | Odin Inspector | Enhanced editor workflow, custom drawers, serialization |
+| Game Feel/VFX | Feel | Streamlined feedback system for polish and juice |
+| Networking | [Mirror / Netcode / Photon / None] | [Multiplayer requirements] |
 | Asset Management | Addressables / Resources | [Dynamic loading requirements] |
 
 ## Directory Structure
@@ -637,7 +641,9 @@ Unity -quit -batchmode -executeMethod BuildScript.ProductionBuild
 
 | Asset | Version | Purpose | License |
 |-------|---------|---------|---------|
-| [Asset name] | [version] | [purpose] | [license type] |
+| DOTween Pro | Latest | Animation and tweening engine for smooth transitions, UI animations, and object motion | Commercial (Unity Asset Store) |
+| Odin Inspector | Latest | Advanced inspector and serialization system for enhanced editor workflow and custom property drawers | Commercial (Unity Asset Store) |
+| Feel | Latest | Game feel and feedback system for polish, juice, camera shake, haptics, and visual effects | Commercial (Unity Asset Store) |
 
 ## Testing Strategy
 
