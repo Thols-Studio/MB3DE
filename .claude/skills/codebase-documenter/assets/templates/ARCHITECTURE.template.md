@@ -526,7 +526,8 @@ Scenes/
 
 #### 1. Frame Rate Optimization
 
-**Target:** [e.g., 60 FPS on PC, 30 FPS on mobile]
+**Target:** 60 FPS on high-end mobile devices, 30 FPS minimum on mid-range devices
+**Platform:** iOS (iPhone 8+), Android (Snapdragon 660+ or equivalent)
 
 **Current bottlenecks:**
 - Draw calls: [number] per frame
@@ -563,13 +564,18 @@ Scenes/
 
 ### Memory Management
 
-**Texture compression:**
-- [Format: e.g., ASTC, ETC2, DXT]
-- Max texture size: [e.g., 2048x2048 for characters, 1024x1024 for environment]
+**Texture compression (Mobile-optimized):**
+- **Android:** ASTC 6x6 (balanced quality/size), ETC2 fallback
+- **iOS:** ASTC 6x6 (iOS 11+), PVRTC 4-bit (legacy devices)
+- Max texture size: 2048x2048 for characters, 1024x1024 for environment
+- Use texture atlases to reduce draw calls
+- Mipmaps enabled for 3D textures
 
-**Audio compression:**
-- Music: Vorbis streaming
-- SFX: Compressed in memory (Vorbis/ADPCM)
+**Audio compression (Mobile-optimized):**
+- **Music:** Vorbis streaming (reduces memory footprint)
+- **SFX:** Compressed in memory (Vorbis for Android, ADPCM for iOS)
+- Sample rate: 22050 Hz for SFX, 44100 Hz for music
+- Mono audio for positional sounds, stereo for music/ambience
 
 **Asset loading:**
 - [Addressables / AssetBundles / Resources]
@@ -580,43 +586,85 @@ Scenes/
 
 ### Platform Targets
 
-| Platform | Build Target | Architecture | Notes |
-|----------|-------------|--------------|-------|
-| PC | Windows/Mac/Linux | x64 | Primary development platform |
-| Mobile | Android / iOS | ARM64 | [Specific requirements] |
-| Console | [PS5/Xbox/Switch] | [Architecture] | [Platform-specific notes] |
-| WebGL | Browser | [Version] | [Performance considerations] |
+| Platform | Build Target | Min Version | Architecture | Notes |
+|----------|-------------|-------------|--------------|-------|
+| Android | Android | API Level 24 (Android 7.0) | ARM64 (arm64-v8a) | Primary mobile platform, supports ARMv7 fallback |
+| iOS | iOS | iOS 12.0+ | ARM64 | iPhone 6s and newer, Metal graphics API required |
+
+**Development Platform:** Windows/Mac/Linux (Unity Editor)
+**Deployment Platforms:** Android and iOS only
+
+**Platform-Specific Requirements:**
+
+**Android:**
+- Minimum SDK: API 24 (Android 7.0 Nougat)
+- Target SDK: API 34 (Android 14) or latest
+- Graphics API: Vulkan (primary), OpenGL ES 3.0 (fallback)
+- IL2CPP scripting backend (ARM64 required for Google Play)
+- Gradle build system
+- Permissions: Configure in AndroidManifest.xml as needed
+
+**iOS:**
+- Minimum iOS: 12.0
+- Target iOS: Latest stable release
+- Graphics API: Metal (required)
+- IL2CPP scripting backend (mandatory)
+- Xcode project export
+- Device support: iPhone, iPad (Universal build recommended)
+- Signing: Development/Distribution certificates required
 
 ### Build Process
 
 ```bash
-# Development build (faster iteration)
-Unity -quit -batchmode -executeMethod BuildScript.DevelopmentBuild
+# Android Development build (faster iteration, testing)
+Unity -quit -batchmode -buildTarget Android -executeMethod BuildScript.AndroidDevelopmentBuild
 
-# Production build (optimized)
-Unity -quit -batchmode -executeMethod BuildScript.ProductionBuild
+# Android Production build (Google Play release)
+Unity -quit -batchmode -buildTarget Android -executeMethod BuildScript.AndroidProductionBuild
+
+# iOS Development build (testing on device)
+Unity -quit -batchmode -buildTarget iOS -executeMethod BuildScript.iOSDevelopmentBuild
+
+# iOS Production build (App Store submission)
+Unity -quit -batchmode -buildTarget iOS -executeMethod BuildScript.iOSProductionBuild
 ```
 
-**Build steps:**
+**Android Build Steps:**
 1. Clean previous build folder
-2. Set build target and configuration
-3. Run preprocessor scripts (asset optimization, etc.)
-4. Build player
-5. Post-process (copy files, create installer)
+2. Set build target to Android
+3. Configure keystore and signing (production only)
+4. Run preprocessor scripts (texture compression, asset optimization)
+5. Build APK or AAB (App Bundle for Google Play)
+6. Post-process (copy to distribution folder, version tracking)
+
+**iOS Build Steps:**
+1. Clean previous build folder
+2. Set build target to iOS
+3. Export Xcode project
+4. Run preprocessor scripts (asset optimization, icon generation)
+5. Open Xcode project for signing and archiving
+6. Post-process (submit to TestFlight or App Store Connect)
 
 ### Build Configurations
 
-**Development:**
+**Development (Testing):**
 - Development build flag enabled
 - Script debugging enabled
 - Profiler enabled
-- No IL2CPP (Mono for faster builds)
+- IL2CPP scripting backend (required for ARM64)
+- Faster build times (lower optimization)
+- Debug symbols included
+- **Android:** Debug keystore, APK format
+- **iOS:** Development provisioning profile
 
-**Production:**
-- Optimization: Maximum
-- IL2CPP enabled (performance + code protection)
-- Strip engine code
-- Compress assets
+**Production (Release):**
+- Optimization: Maximum (size or speed)
+- IL2CPP scripting backend (mandatory for both platforms)
+- Strip engine code (reduce build size)
+- Compress assets (ASTC for Android, PVRTC/ASTC for iOS)
+- Code obfuscation enabled
+- **Android:** Release keystore, AAB format for Google Play
+- **iOS:** Distribution provisioning profile, App Store submission
 
 ## Unity Package Dependencies
 
