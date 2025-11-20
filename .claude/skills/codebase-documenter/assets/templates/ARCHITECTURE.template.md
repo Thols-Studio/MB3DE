@@ -57,12 +57,11 @@ This document explains the high-level architecture of [Project Name], a Unity3D 
 
 | Layer | Technology | Why We Chose It |
 |-------|-----------|-----------------|
-| Game Engine | Unity 2022.3 LTS | Long-term support, stability for production |
+| Game Engine | Unity 6000.0.62f1 LTS | Long-term support, stability for production |
 | Scripting | C# .NET Standard 2.1 | Unity's primary language, strong typing |
 | Input | [New Input System / Legacy] | [Better multi-platform support / Simpler API] |
 | Physics | [2D / 3D / Both] | [Project requirements] |
 | UI | [UI Toolkit / UGUI / Both] | [Modern/Legacy approach] |
-| Networking | [Mirror / Netcode / Photon / None] | [Multiplayer requirements] |
 | Asset Management | Addressables / Resources | [Dynamic loading requirements] |
 
 ## Directory Structure
